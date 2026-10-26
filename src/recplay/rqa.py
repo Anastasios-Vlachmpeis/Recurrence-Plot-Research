@@ -36,7 +36,7 @@ def rqa(R: np.ndarray) -> dict:
     """RR, DET, L, ENTR, LAM, DET(lmin=3)/DET(lmin=2) and K2_lines of a recurrence matrix."""
     diag, vert = line_lengths(R)
     pts = diag.sum()
-    det = lambda lmin: diag[diag >= lmin].sum() / pts
+    det = lambda lmin: diag[diag >= lmin].sum() / pts if pts else np.nan
     long = diag[diag >= 2]
     p = np.bincount(long)[2:]
     p = p[p > 0] / p.sum()

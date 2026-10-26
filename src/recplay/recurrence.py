@@ -22,18 +22,25 @@ def recurrence(series: pd.Series, m: int, tau: int, rr: float):
     return D, D <= eps, eps, series.index[(m - 1) * tau :]
 
 
-def recurrence_matrix(states: np.ndarray, rr: float, theiler: int = 1) -> np.ndarray:
-    """Euclidean RP of given states with the main diagonal and the Theiler band set to False.
+def threshold_by_rate(d: np.ndarray, rr: float, theiler: int = 1) -> np.ndarray:
+    """RP from a distance or divergence matrix, with the main diagonal and the Theiler band set to False.
 
     ε is chosen so the recurrence rate over pairs with |i - j| >= theiler equals rr.
     """
-    d = euclidean_distances(states)
     n = len(d)
     band = np.abs(np.arange(n)[:, None] - np.arange(n)[None, :]) < theiler
     eps = np.quantile(d[np.triu_indices(n, theiler)], rr)
     R = d <= eps
     R[band] = False
     return R
+
+
+def recurrence_matrix(states: np.ndarray, rr: float, theiler: int = 1) -> np.ndarray:
+    """Euclidean RP of given states with the main diagonal and the Theiler band set to False.
+
+    ε is chosen so the recurrence rate over pairs with |i - j| >= theiler equals rr.
+    """
+    return threshold_by_rate(euclidean_distances(states), rr, theiler)
 
 
 def joint_matrix(state_list, rr: float, theiler: int = 1) -> np.ndarray:
@@ -45,12 +52,15 @@ def joint_matrix(state_list, rr: float, theiler: int = 1) -> np.ndarray:
 
 
 def symmetric_beta_matrix(states: np.ndarray, beta: float) -> np.ndarray:
-    """Coordinate-summed mean of forward and reverse β-divergences (Févotte & Idier, §2.1)."""
+    """Coordinate-summed mean of forward and reverse β-divergences (Févotte & Idier, §2.1).
+
+    S_β(x, y) = (x - y)(x^(β-1) - y^(β-1)) / (2(β - 1)) for any real β ≠ 1, and (x - y)(ln x - ln y) / 2 at β = 1.
+    """
     states = np.asarray(states, dtype=float)
     if states.ndim != 2 or not np.isfinite(states).all() or np.any(states <= 0):
         raise ValueError("β-divergence states must be a finite, strictly positive 2D array")
-    if not np.isfinite(beta) or beta < 1:
-        raise ValueError("This implementation supports β >= 1")
+    if not np.isfinite(beta):
+        raise ValueError("β must be finite")
     transformed = np.log(states) if beta == 1 else states ** (beta - 1) / (beta - 1)
     divergence = 0.5 * (
         (states[:, None, :] - states[None, :, :])
