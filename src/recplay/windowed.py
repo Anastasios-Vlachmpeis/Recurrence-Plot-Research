@@ -30,6 +30,11 @@ def beta_distance(z: np.ndarray, m: int, tau: int, beta: float) -> np.ndarray:
     return symmetric_beta_matrix(embed(np.exp(z), m, tau), beta)
 
 
+def exp_euclidean_distance(z: np.ndarray, m: int, tau: int) -> np.ndarray:
+    """Euclidean distance between embedded exp(z) states, the states beta_distance uses."""
+    return euclidean_distances(embed(np.exp(z), m, tau))
+
+
 def rqa_frame(data: pd.DataFrame, series: dict, joints: dict, W: int, m: int, tau: int, rr: float,
               distance, theiler: int = 1) -> pd.DataFrame:
     """rqa() of every single-series RP (thresholded at rate rr) and every joint RP, columns '<prefix>_<measure>'.
