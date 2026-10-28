@@ -56,6 +56,7 @@ RecPlay/
 | 02 | `CPI_direction_betaRP_screening` | Same screening with symmetric β-divergence RPs of exp(z) window states, β ∈ {−5, −2, −1, −0.5, 0.5, 1, 2, 5} as an extra factor | FRED |
 | 02 | `CPI_direction_monthlyRP_horizons` | Direction of YoY inflation 1, 3, 6 and 12 months ahead: lag model with monthly inflation and the explicit base effect vs the same plus RP features of monthly inflation (window RQA, current-state RR, RRc, window mean/std, analogue forecasts); screening 1975–1999, one final test on 2000–2026 | FRED |
 | 02 | `CPI_direction_betaRP_refinement` | β-divergence RPs of monthly inflation (W = 120, m = 2, τ = 1, rr = 0.05) for the same horizons: coarse-to-fine β search to depth 3 per horizon (8 β, then 8 β between the best and its better neighbour, twice) on 1975–1999, against Euclidean on z and on exp(z) and a β-profile model; every tried β scored once on 2000–2026 | FRED |
+| 02 | `CPI_direction_embedding_sweep` | h = 6 and 12: ablation of the window mean/std vs RQA/RRc features; embedding (m, τ) chosen from 1954–1999 monthly inflation by AMI and false nearest neighbours; sweep of embedding span (1–24 months) for Euclidean on z and on exp(z), the best of 8 β and a β-profile model, each scored against lags+base+mean/std on 1975–1999 and 2000–2026 | FRED |
 | 03 | `RUT_SP500_NDX_RR` | Monthly log-return recurrences of the Russell 2000, S&P 500 and Nasdaq-100 | Yahoo, `^RUT` `^GSPC` `^NDX` |
 | 03 | `NDX_2025_5min_RP_benchmark` | Sliding-window RP compute time, Euclidean vs β-divergence (β = 1, 3, 7), calendar year 2025 | 5-min `^NDX` from a local CSV (not supplied) |
 | 03 | `NDX_60d_5min_RP_benchmark` | Same benchmark on the last 60 days available from Yahoo | Yahoo, 5-min `^NDX` |
@@ -65,7 +66,7 @@ RecPlay/
 
 | Module | Contents |
 |---|---|
-| `embedding` | `embed`: time-delay embedding |
+| `embedding` | `embed`: time-delay embedding; `average_mutual_information`, `first_local_minimum` and `false_nearest_fraction` to choose τ and m |
 | `recurrence` | distance matrices, symmetric β-divergence (any real β), ε set by a target recurrence rate (`threshold_by_rate`), single and joint recurrence matrices |
 | `rqa` | diagonal/vertical line lengths, `rqa` measures, `k2_lines` |
 | `connectivity` | `rr_critical`: RRc, the RR at which an 8-connected recurrence cluster first links the first δN rows to the last δN columns (union–find); `omega_ranks` for joint RPs |
@@ -90,6 +91,7 @@ pairs with j − i ≥ `min_sep`.
 | `data/processed/rp_screening/` | Caches of the screening notebooks: `iaaft/` window surrogates (shared), `euclidean/` and `beta/` RQA and RRc features | Delete a folder after changing the code that builds it |
 | `data/processed/monthly_pi/` | Cache of `CPI_direction_monthlyRP_horizons`: `iaaft/` surrogates of monthly-inflation windows, `rqa/` and `rrc/` features | Delete after changing the code that builds it |
 | `data/processed/beta_refinement/` | Cache of `CPI_direction_betaRP_refinement`: `iaaft/` surrogates, `rqa/` and `rrc/` features per arm (β or Euclidean) | Delete after changing the code that builds it |
+| `data/processed/embedding_sweep/` | Cache of `CPI_direction_embedding_sweep`: `iaaft/` surrogates, `rqa/` and `rrc/` features per (m, τ, arm) | Delete after changing the code that builds it |
 
 ## Results
 
@@ -105,4 +107,6 @@ pairs with j − i ≥ `min_sep`.
 - Theiler, J. (1986). Spurious dimension from correlation algorithms applied to limited time-series data. *Physical Review A* 34, 2427.
 - Goyal, A., Welch, I. (2008). A comprehensive look at the empirical performance of equity premium prediction. *Review of Financial Studies* 21, 1455–1508. Data updated annually.
 - Schreiber, T., Schmitz, A. (1996). Improved surrogate data for nonlinearity tests. *Physical Review Letters* 77, 635–638.
+- Fraser, A. M., Swinney, H. L. (1986). Independent coordinates for strange attractors from mutual information. *Physical Review A* 33, 1134.
+- Kennel, M. B., Brown, R., Abarbanel, H. D. I. (1992). Determining embedding dimension for phase-space reconstruction using a geometrical construction. *Physical Review A* 45, 3403.
 - Federal Reserve Bank of St. Louis, FRED: https://fred.stlouisfed.org
