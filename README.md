@@ -57,6 +57,7 @@ RecPlay/
 | 02 | `CPI_direction_monthlyRP_horizons` | Direction of YoY inflation 1, 3, 6 and 12 months ahead: lag model with monthly inflation and the explicit base effect vs the same plus RP features of monthly inflation (window RQA, current-state RR, RRc, window mean/std, analogue forecasts); screening 1975–1999, one final test on 2000–2026 | FRED |
 | 02 | `CPI_direction_betaRP_refinement` | β-divergence RPs of monthly inflation (W = 120, m = 2, τ = 1, rr = 0.05) for the same horizons: coarse-to-fine β search to depth 3 per horizon (8 β, then 8 β between the best and its better neighbour, twice) on 1975–1999, against Euclidean on z and on exp(z) and a β-profile model; every tried β scored once on 2000–2026 | FRED |
 | 02 | `CPI_direction_embedding_sweep` | h = 6 and 12: ablation of the window mean/std vs RQA/RRc features; embedding (m, τ) chosen from 1954–1999 monthly inflation by AMI and false nearest neighbours; sweep of embedding span (1–24 months) for Euclidean on z and on exp(z), the best of 8 β and a β-profile model, each scored against lags+base+mean/std on 1975–1999 and 2000–2026 | FRED |
+| 02 | `CPI_direction_crosscountry` | Pre-registered confirmation: reference (inflation lags, base effect, base-effect rule) vs reference + RQA/RRc of seasonally adjusted monthly inflation (W = 120, m = 2, τ = 1), h = 12 primary and h = 6, walk-forward from 1990 in 24 OECD countries plus the US; pooled AUC gain with a year-block bootstrap. Result: not confirmed (h = 12 pooled gain −0.033, 95% −0.059 to −0.008) | FRED (OECD MEI CPI) |
 | 03 | `RUT_SP500_NDX_RR` | Monthly log-return recurrences of the Russell 2000, S&P 500 and Nasdaq-100 | Yahoo, `^RUT` `^GSPC` `^NDX` |
 | 03 | `NDX_2025_5min_RP_benchmark` | Sliding-window RP compute time, Euclidean vs β-divergence (β = 1, 3, 7), calendar year 2025 | 5-min `^NDX` from a local CSV (not supplied) |
 | 03 | `NDX_60d_5min_RP_benchmark` | Same benchmark on the last 60 days available from Yahoo | Yahoo, 5-min `^NDX` |
@@ -86,12 +87,14 @@ pairs with j − i ≥ `min_sep`.
 | Path | Source | Notes |
 |---|---|---|
 | `data/raw/fred/` | FRED CSV downloads: `CPIAUCSL`, `UNRATE`, `FEDFUNDS` (monthly) | Downloaded 18 Oct 2026. October 2025 CPI and UNRATE are blank: BLS did not collect them during the government shutdown. `CPI_UNRATE_FEDFUNDS_RR` interpolates and flags that month. |
+| `data/raw/oecd_mei/` | FRED CSV downloads of OECD MEI CPI indices `<ISO>CPIALLMINMEI` (monthly, not seasonally adjusted) | Downloaded automatically by `CPI_direction_crosscountry` on first run (28 Oct 2026); most series end in early 2025, Japan in 2021 |
 | `data/raw/goyal_welch/Goyal_Welch_2025.xlsx` | Goyal & Welch equity-premium predictor data, 2025 update, `Monthly` sheet | 1871–2025 |
 | `data/raw/yahoo/` | yfinance timezone cache | Created automatically; prices are downloaded live and change between runs |
 | `data/processed/rp_screening/` | Caches of the screening notebooks: `iaaft/` window surrogates (shared), `euclidean/` and `beta/` RQA and RRc features | Delete a folder after changing the code that builds it |
 | `data/processed/monthly_pi/` | Cache of `CPI_direction_monthlyRP_horizons`: `iaaft/` surrogates of monthly-inflation windows, `rqa/` and `rrc/` features | Delete after changing the code that builds it |
 | `data/processed/beta_refinement/` | Cache of `CPI_direction_betaRP_refinement`: `iaaft/` surrogates, `rqa/` and `rrc/` features per arm (β or Euclidean) | Delete after changing the code that builds it |
 | `data/processed/embedding_sweep/` | Cache of `CPI_direction_embedding_sweep`: `iaaft/` surrogates, `rqa/` and `rrc/` features per (m, τ, arm) | Delete after changing the code that builds it |
+| `data/processed/crosscountry/` | Cache of `CPI_direction_crosscountry`: RQA/RRc features per country | Delete after changing the code that builds it |
 
 ## Results
 
