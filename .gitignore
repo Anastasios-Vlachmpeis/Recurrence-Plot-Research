@@ -1,6 +1,10 @@
 /.venv
+/.venv-stock-repro
+/.venv-stock-repro312
 /anaconda_projects
 /.idea
 /tec.txt
 /data
 /src/recplay/__pycache__
+/notebooks/01_reproductions/Stock_trend_RQA_transposed_transformer/__pycache__/
+/results

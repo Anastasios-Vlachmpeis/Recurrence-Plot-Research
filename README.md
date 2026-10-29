@@ -21,7 +21,18 @@ Python 3.12. Third-party packages used by the notebooks:
 pip install numpy pandas scipy matplotlib scikit-learn torch yfinance openpyxl jupyter
 ```
 
-`torch` is only needed for `EucRPRepro` (expects a CUDA device). Versions are not pinned yet.
+`torch` is needed for the reproduction notebooks; `EucRPRepro` expects a CUDA device.
+`Stock_trend_RQA_transposed_transformer` has its own pinned
+`notebooks/01_reproductions/requirements-stock-trend.txt` and Python 3.12 environment
+(`.venv-stock-repro312`, kernel **Stock trend reproduction**). Its setup cells document the
+separate CUDA PyTorch installation. Historical execution requires `TUSHARE_TOKEN` and
+Tushare historical-minute, calendar and daily-data permissions. `STOCK_REPRO_MODE=smoke`
+explicitly exercises synthetic minute bars; those outputs are not a financial replication.
+Its implementation is split into classes in the sibling
+`notebooks/01_reproductions/Stock_trend_RQA_transposed_transformer/` package:
+`ExperimentConfig`, `DataService`, `RQAExtractor`, PyTorch model classes, `Trainer`,
+`Reporter` and `ReproductionChecks`. The notebook contains imports and orchestration;
+restart its kernel after editing the modules. Cache identities include module sources.
 
 Run every notebook from its own folder (Jupyter and PyCharm do this by default). Paths to `data/` and
 `results/` are relative to the notebook, e.g. `../../data/raw/fred`.
@@ -51,6 +62,7 @@ RecPlay/
 | 00 | `recplay` | First distance matrix and thresholded RP on intraday prices; 3D recurrence onset surface over continuous ε (up to RR = 100 %) for the full series and a 20-point chunk, with timings | Yahoo, `CSG.AS` 2-min |
 | 00 | `recplay_3d_viewer.py` (script) | Rotatable 3D onset surfaces for every sliding window of the day (default 20 samples, m = 2, τ = 1), slider / arrow keys to step through time, price panel shading the current window; `--help` for ticker, dates, window length, step, ε, fixed z scale | Yahoo, `CSG.AS` 2-min |
 | 01 | `EucRPRepro` | Reproduction of Arratia & Sepúlveda: Euclidean RPs + CNN for the sign of the S&P 500 equity premium | Goyal–Welch 2025 |
+| 01 | `Stock_trend_RQA_transposed_transformer` | Su et al. (2025): 13 RQA features + variable-token Transformer, all six named baselines, branch removals and six RQA-input arms; chronological selection/refit and paper comparison tables | Tushare Pro, seven A-share stocks, 1-minute OHLCV, 2018–2022; token/permissions required |
 | 02 | `CPI_UNRATE_FEDFUNDS_RR` | Inflation, unemployment and fed funds rate, 1954–2026: individual, pairwise and triple joint RPs; independence ratios, Theiler window, joint covariance/correlation; β-divergence RPs | FRED |
 | 02 | `CPI_direction_RP_screening` | Which Euclidean sliding-window RP parameter (W, m, τ, target RR, input series) matters for predicting next month's YoY-inflation direction: RQA + RRc features, LightGBM with yearly expanding windows, variance decomposition and meta-model on 1975–1999, one final test on 2000–2026 | FRED |
 | 02 | `CPI_direction_betaRP_screening` | Same screening with symmetric β-divergence RPs of exp(z) window states, β ∈ {−5, −2, −1, −0.5, 0.5, 1, 2, 5} as an extra factor | FRED |
@@ -90,6 +102,8 @@ pairs with j − i ≥ `min_sep`.
 | `data/raw/oecd_mei/` | FRED CSV downloads of OECD MEI CPI indices `<ISO>CPIALLMINMEI` (monthly, not seasonally adjusted) | Downloaded automatically by `CPI_direction_crosscountry` on first run (28 Oct 2026); most series end in early 2025, Japan in 2021 |
 | `data/raw/goyal_welch/Goyal_Welch_2025.xlsx` | Goyal & Welch equity-premium predictor data, 2025 update, `Monthly` sheet | 1871–2025 |
 | `data/raw/yahoo/` | yfinance timezone cache | Created automatically; prices are downloaded live and change between runs |
+| `data/raw/stock_trend_tushare/` | Tushare `stk_mins`, `trade_cal`, `daily` | Raw gzip CSV responses with metadata/SHA256 checks; no historical data supplied |
+| `data/processed/stock_trend_repro/{full,smoke}/` | Stock-trend notebook | Code/input-fingerprinted RQA caches, epoch selections, neural checkpoints and predictions; synthetic smoke kept separate |
 | `data/processed/rp_screening/` | Caches of the screening notebooks: `iaaft/` window surrogates (shared), `euclidean/` and `beta/` RQA and RRc features | Delete a folder after changing the code that builds it |
 | `data/processed/monthly_pi/` | Cache of `CPI_direction_monthlyRP_horizons`: `iaaft/` surrogates of monthly-inflation windows, `rqa/` and `rrc/` features | Delete after changing the code that builds it |
 | `data/processed/beta_refinement/` | Cache of `CPI_direction_betaRP_refinement`: `iaaft/` surrogates, `rqa/` and `rrc/` features per arm (β or Euclidean) | Delete after changing the code that builds it |
@@ -102,6 +116,7 @@ pairs with j − i ≥ `min_sep`.
 |---|---|
 | `results/tables/det_predictability_results.csv` | `DETPredictability` |
 | `results/tables/det_predictability_window_sweep.csv` | `DETPredictability` |
+| `results/tables/stock_trend_repro/{full,smoke}/<run hash>/` | `Stock_trend_RQA_transposed_transformer`: predictions, seed/stock summaries, published-reference comparisons, ablations, coverage, manifest and diagnostic figures; full-mode `missing_data.csv` lists unavailable source ranges |
 
 ## References
 
